@@ -40,13 +40,13 @@ fn print_stat(stat: usize, origin: &str, name: &str) {
     );
 }
 
-fn print_changes(path: &Path, branch: &str, changeset: Changeset) {
+fn print_changes(changeset: Changeset) {
     if !changeset.has_changes() {
-        report_unchanged_repo(path, branch);
+        report_unchanged_repo(changeset.path(), changeset.branch());
         return;
     }
 
-    report_modified_repo(path, branch);
+    report_modified_repo(changeset.path(), changeset.branch());
 
     for change in changeset.changes() {
         match change {
@@ -96,6 +96,8 @@ fn main() {
         ignore_branch_regex = None;
     }
 
+    let mut changes = vec![];
+
     for path in repos {
         let repo = git2::Repository::open(&path).unwrap();
         let branches;
@@ -113,9 +115,13 @@ fn main() {
                 }
             }
 
-            if let Ok(changeset) = git::check_repository(&repo, &branch) {
-                print_changes(&path, &branch, changeset);
+            if let Ok(changeset) = git::check_repository(&repo, path.clone(), &branch) {
+                changes.push(changeset);
             }
         }
+    }
+
+    for change in changes {
+        print_changes(change);
     }
 }
