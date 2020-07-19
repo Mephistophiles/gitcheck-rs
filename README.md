@@ -1,5 +1,7 @@
 # gitcheck-rs
 
+![Rust](https://github.com/Mephistophiles/gitcheck-rs/workflows/Rust/badge.svg)
+
 This is a Rust replacement for gitcheck written by Python (https://github.com/badele/gitcheck)
 
 # Installation
