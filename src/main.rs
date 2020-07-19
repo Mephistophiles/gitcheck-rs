@@ -2,7 +2,6 @@ use ansi_term::Colour::White;
 
 use crate::git::{Change, Changeset};
 
-use crossbeam::crossbeam_channel;
 use log::debug;
 use rayon::prelude::*;
 use std::path::Path;
