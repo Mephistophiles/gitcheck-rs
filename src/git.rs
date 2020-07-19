@@ -134,7 +134,7 @@ fn check_remote_changes(
 pub(crate) fn check_repository(
     repo: &Repository,
     path: PathBuf,
-    branch: &str,
+    branch: String,
 ) -> Result<Changeset> {
     let mut changeset = vec![];
 
@@ -142,12 +142,12 @@ pub(crate) fn check_repository(
 
     let remotes = repo.remotes()?;
     for remote in remotes.iter().filter_map(|r| r) {
-        check_remote_changes(&repo, branch, remote, &mut changeset);
+        check_remote_changes(&repo, &branch, remote, &mut changeset);
     }
 
     Ok(Changeset {
         path,
-        branch: branch.to_string(),
+        branch,
         changes: changeset,
     })
 }

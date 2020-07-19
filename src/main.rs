@@ -116,7 +116,7 @@ fn main() {
                     }
                 }
 
-                if let Ok(changeset) = git::check_repository(&repo, path.clone(), &branch) {
+                if let Ok(changeset) = git::check_repository(&repo, path.clone(), branch) {
                     send.send(changeset).unwrap();
                 }
             }
