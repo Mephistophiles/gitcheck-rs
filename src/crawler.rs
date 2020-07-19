@@ -11,6 +11,7 @@ pub(crate) fn search_repositories(max_depth: usize) -> BTreeSet<PathBuf> {
     debug!("Beginning scan... building list of git folders");
     for entry in WalkDir::new(&pwd)
         .max_depth(max_depth)
+        .same_file_system(true)
         .into_iter()
         .filter_map(|e| e.ok())
     {
