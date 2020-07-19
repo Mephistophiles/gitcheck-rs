@@ -97,7 +97,7 @@ fn main() {
         ignore_branch_regex = None;
     }
 
-    let (send, recv) = crossbeam_channel::unbounded();
+    let (send, recv) = crossbeam_channel::bounded(repos.len());
 
     thread::spawn(move || {
         repos.par_iter().for_each(|path| {
