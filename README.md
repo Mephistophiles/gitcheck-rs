@@ -18,6 +18,18 @@ This repository is currently in WIP (Work-In-Progress) state. At this moment rel
 * Select directory `--dir`
 * Select ignored git branches `--ignore-branch`
 
+# TODO
+
+ - [ ] Quiet mode (`--quiet`)
+ - [ ] Verbose output (`--verbose`)
+ - [ ] Fetch repositories (`--remote`)
+ - [ ] Check untracked files (`--untracked`)
+ - [ ] All branch mode (`--all-branch`)
+ - [ ] Support ignore list (`--localignore`)
+ - [ ] Terminal bell on repository changes (`--bell`)
+ - [ ] Watch mode (`--watch`)
+ - [ ] Send email on repository changes (`--email`, `--init-email`)
+
 # Options
 
 ```
