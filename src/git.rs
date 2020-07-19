@@ -21,7 +21,7 @@ pub(crate) struct Changeset {
 
 impl Changeset {
     pub(crate) fn has_changes(&self) -> bool {
-        self.changes.len() > 0
+        !self.changes.is_empty()
     }
     pub(crate) fn changes(&self) -> &[Change] {
         &self.changes
@@ -146,7 +146,7 @@ pub(crate) fn check_repository(
     }
 
     Ok(Changeset {
-        path: path,
+        path,
         branch: branch.to_string(),
         changes: changeset,
     })
