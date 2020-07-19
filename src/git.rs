@@ -1,7 +1,7 @@
 use crate::error::Result;
 
 use git2::{Repository, Status, StatusOptions};
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 pub(crate) struct LocalChanges {
     pub(crate) modified: usize,
@@ -131,7 +131,11 @@ fn check_remote_changes(
     Some(())
 }
 
-pub(crate) fn check_repository(repo: &Repository, path: PathBuf, branch: &str) -> Result<Changeset> {
+pub(crate) fn check_repository(
+    repo: &Repository,
+    path: PathBuf,
+    branch: &str,
+) -> Result<Changeset> {
     let mut changeset = vec![];
 
     check_local_changes(&repo, &mut changeset);
@@ -144,6 +148,6 @@ pub(crate) fn check_repository(repo: &Repository, path: PathBuf, branch: &str) -
     Ok(Changeset {
         path: path,
         branch: branch.to_string(),
-        changes: changeset
+        changes: changeset,
     })
 }

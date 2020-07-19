@@ -2,10 +2,11 @@ use ansi_term::Colour::White;
 
 use crate::git::{Change, Changeset};
 
+use crossbeam::crossbeam_channel;
 use log::debug;
-
-use std::env;
+use rayon::prelude::*;
 use std::path::Path;
+use std::{env, thread};
 
 mod cmdline;
 mod colors;
@@ -96,32 +97,36 @@ fn main() {
         ignore_branch_regex = None;
     }
 
-    let mut changes = vec![];
+    let (send, recv) = crossbeam_channel::unbounded();
 
-    for path in repos {
-        let repo = git2::Repository::open(&path).unwrap();
-        let branches;
+    thread::spawn(move || {
+        repos.par_iter().for_each(|path| {
+            let repo = git2::Repository::open(&path).unwrap();
+            let branches;
 
-        if check_all {
-            branches = git::get_all_branches(&repo);
-        } else {
-            branches = git::get_default_branch(&repo);
-        }
+            if check_all {
+                branches = git::get_all_branches(&repo);
+            } else {
+                branches = git::get_default_branch(&repo);
+            }
 
-        for branch in branches {
-            if let Some(ref ignore_regex) = ignore_branch_regex {
-                if ignore_regex.is_match(&branch) {
-                    continue;
+            for branch in branches {
+                if let Some(ref ignore_regex) = ignore_branch_regex {
+                    if ignore_regex.is_match(&branch) {
+                        continue;
+                    }
+                }
+
+                if let Ok(changeset) = git::check_repository(&repo, path.clone(), &branch) {
+                    send.send(changeset).unwrap();
                 }
             }
+        });
 
-            if let Ok(changeset) = git::check_repository(&repo, path.clone(), &branch) {
-                changes.push(changeset);
-            }
-        }
-    }
+        drop(send);
+    });
 
-    for change in changes {
+    for change in recv.iter() {
         print_changes(change);
     }
 }

@@ -1,11 +1,10 @@
 use log::debug;
-use std::collections::BTreeSet;
 use std::env;
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
-pub(crate) fn search_repositories(max_depth: usize) -> BTreeSet<PathBuf> {
-    let mut repo = BTreeSet::new();
+pub(crate) fn search_repositories(max_depth: usize) -> Vec<PathBuf> {
+    let mut repo = Vec::with_capacity(16);
     let pwd = env::current_dir().unwrap();
 
     debug!("Beginning scan... building list of git folders");
@@ -23,7 +22,7 @@ pub(crate) fn search_repositories(max_depth: usize) -> BTreeSet<PathBuf> {
             path.pop();
 
             debug!("  Add {} repository", path.display());
-            repo.insert(path);
+            repo.push(path);
         }
     }
     debug!("Done");
