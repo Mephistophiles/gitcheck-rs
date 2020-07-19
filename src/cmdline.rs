@@ -78,12 +78,12 @@ pub(crate) fn parse_args() -> ArgMatches {
         //         .long("email")
         //         .about("Send an email with result as html, using mail.properties parameters"),
         // )
-        // .arg(
-        //     Arg::with_name("all-branch")
-        //         .short('a')
-        //         .long("all-branch")
-        //         .about("Show the status of all branches"),
-        // )
+        .arg(
+            Arg::with_name("all-branch")
+                .short('a')
+                .long("all-branch")
+                .about("Show the status of all branches"),
+        )
         // .arg(
         //     Arg::with_name("localignore")
         //         .short('l')

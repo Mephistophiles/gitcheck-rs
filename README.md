@@ -24,7 +24,7 @@ This repository is currently in WIP (Work-In-Progress) state. At this moment rel
  - [ ] Verbose output (`--verbose`)
  - [ ] Fetch repositories (`--remote`)
  - [ ] Check untracked files (`--untracked`)
- - [ ] All branch mode (`--all-branch`)
+ - [X] All branch mode (`--all-branch`)
  - [ ] Support ignore list (`--localignore`)
  - [ ] Terminal bell on repository changes (`--bell`)
  - [ ] Watch mode (`--watch`)
@@ -41,9 +41,10 @@ USAGE:
     gitcheck [FLAGS] [OPTIONS]
 
 FLAGS:
-        --debug      Show debug message
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    -a, --all-branch    Show the status of all branches
+        --debug         Show debug message
+    -h, --help          Prints help information
+    -V, --version       Prints version information
 
 OPTIONS:
     -d, --dir <dir>              Search <dir> for repositories (can be used multiple times)
