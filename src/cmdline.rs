@@ -97,5 +97,13 @@ pub(crate) fn parse_args() -> ArgMatches {
         //         "Initialize mail.properties file (has to be modified by user using JSON Format",
         //     ),
         // )
+        .arg(
+            Arg::with_name("jobs")
+                .short('j')
+                .long("jobs")
+                .value_name("jobs")
+                .takes_value(true)
+                .about("Specifies  the  number  of jobs (commands) to run simultaneously. (Default $(nprocs))"),
+        )
         .get_matches()
 }

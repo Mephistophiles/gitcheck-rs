@@ -96,6 +96,13 @@ fn main() {
     let ignore_branch_regex;
     let check_all = matches.is_present("all-branch");
 
+    if let Some(j) = matches.value_of("jobs") {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(j.parse().unwrap())
+            .build_global()
+            .unwrap();
+    }
+
     if let Some(li) = matches.value_of("ignore-branch") {
         ignore_branch_regex = Some(regex::Regex::new(li).unwrap());
     } else {
