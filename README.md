@@ -29,6 +29,8 @@ This repository is currently in WIP (Work-In-Progress) state. At this moment rel
  - [ ] Terminal bell on repository changes (`--bell`)
  - [ ] Watch mode (`--watch`)
  - [ ] Send email on repository changes (`--email`, `--init-email`)
+ - [ ] Add tests
+ - [ ] Add docs
 
 # Options
 
