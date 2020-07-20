@@ -20,7 +20,7 @@ This repository is currently in WIP (Work-In-Progress) state. At this moment rel
 
 # TODO
 
- - [ ] Quiet mode (`--quiet`)
+ - [X] Quiet mode (`--quiet`)
  - [ ] Verbose output (`--verbose`)
  - [ ] Fetch repositories (`--remote`)
  - [ ] Check untracked files (`--untracked`)
@@ -44,6 +44,7 @@ FLAGS:
     -a, --all-branch    Show the status of all branches
         --debug         Show debug message
     -h, --help          Prints help information
+    -q, --quiet         Display info only when repository needs action
     -V, --version       Prints version information
 
 OPTIONS:

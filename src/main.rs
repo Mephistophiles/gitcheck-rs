@@ -85,6 +85,8 @@ fn main() {
     }
     debug!("Global Vars: {:?}", env::args());
 
+    let quiet = matches.is_present("quiet");
+
     let max_depth: usize = match matches.value_of("maxdepth") {
         Some(i) => i.parse().unwrap(),
         None => usize::MAX,
@@ -122,7 +124,9 @@ fn main() {
                 }
 
                 if let Ok(changeset) = git::check_repository(&repo, path.clone(), branch) {
-                    send.send(changeset).unwrap();
+                    if !quiet || changeset.has_changes() {
+                        send.send(changeset).unwrap();
+                    }
                 }
             }
         });

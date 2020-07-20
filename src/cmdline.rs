@@ -66,12 +66,12 @@ pub(crate) fn parse_args() -> ArgMatches {
                 .takes_value(true)
                 .about("Limit the depth of repositories search"),
         )
-        // .arg( // TODO
-        //     Arg::with_name("quiet")
-        //         .short('q')
-        //         .long("quiet")
-        //         .about("Display info only when repository needs action"),
-        // )
+        .arg(
+            Arg::with_name("quiet")
+                .short('q')
+                .long("quiet")
+                .about("Display info only when repository needs action"),
+        )
         // .arg(
         //     Arg::with_name("email")
         //         .short('e')
