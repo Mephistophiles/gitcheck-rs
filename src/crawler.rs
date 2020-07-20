@@ -8,6 +8,8 @@ pub(crate) fn search_repositories(max_depth: usize) -> Vec<PathBuf> {
     let pwd = env::current_dir().unwrap();
 
     debug!("Beginning scan... building list of git folders");
+    debug!("  Scan git repositories from {}", pwd.display());
+
     for entry in WalkDir::new(&pwd)
         .max_depth(max_depth)
         .same_file_system(true)
@@ -15,8 +17,6 @@ pub(crate) fn search_repositories(max_depth: usize) -> Vec<PathBuf> {
         .filter_map(|e| e.ok())
         .filter(|e| e.file_type().is_dir())
     {
-        debug!("  Scan git repositories from {}", entry.path().display());
-
         if entry.file_name() == ".git" {
             let mut path = entry.into_path();
             path.pop();

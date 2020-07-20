@@ -92,7 +92,6 @@ fn main() {
         None => usize::MAX,
     };
 
-    debug!("Processing repositories... please wait.");
     let repos = crawler::search_repositories(max_depth);
     let ignore_branch_regex;
     let check_all = matches.is_present("all-branch");
@@ -104,6 +103,8 @@ fn main() {
     }
 
     let (send, recv) = crossbeam_channel::bounded(repos.len());
+
+    debug!("Processing repositories... please wait.");
 
     thread::spawn(move || {
         repos.par_iter().for_each(|path| {
