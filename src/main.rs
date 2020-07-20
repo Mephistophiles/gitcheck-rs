@@ -4,7 +4,7 @@ use crate::git::{Change, Changeset};
 
 use log::debug;
 use rayon::prelude::*;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::{env, thread};
 
 mod cmdline;
@@ -40,13 +40,18 @@ fn print_stat(stat: usize, origin: &str, name: &str) {
     );
 }
 
-fn print_changes(changeset: Changeset) {
+fn print_changes(pwd: &Path, changeset: Changeset) {
+    let mut repo_path = changeset.path().strip_prefix(&pwd).unwrap();
+    if repo_path == Path::new("") {
+        repo_path = Path::new(changeset.path().file_name().unwrap());
+    }
+
     if !changeset.has_changes() {
-        report_unchanged_repo(changeset.path(), changeset.branch());
+        report_unchanged_repo(repo_path, changeset.branch());
         return;
     }
 
-    report_modified_repo(changeset.path(), changeset.branch());
+    report_modified_repo(repo_path, changeset.branch());
 
     for change in changeset.changes() {
         match change {
@@ -125,7 +130,8 @@ fn main() {
         drop(send);
     });
 
+    let pwd = env::current_dir().unwrap_or_else(|_| PathBuf::from("/"));
     for change in recv.iter() {
-        print_changes(change);
+        print_changes(&pwd, change);
     }
 }

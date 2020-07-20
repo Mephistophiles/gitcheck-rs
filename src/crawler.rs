@@ -18,8 +18,7 @@ pub(crate) fn search_repositories(max_depth: usize) -> Vec<PathBuf> {
         debug!("  Scan git repositories from {}", entry.path().display());
 
         if entry.file_name() == ".git" {
-            let path = entry.path().strip_prefix(&pwd).unwrap();
-            let mut path = path.to_path_buf();
+            let mut path = entry.into_path();
             path.pop();
 
             debug!("  Add {} repository", path.display());
