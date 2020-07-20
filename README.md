@@ -52,5 +52,6 @@ FLAGS:
 OPTIONS:
     -d, --dir <dir>              Search <dir> for repositories (can be used multiple times)
     -i, --ignore-branch <re>     ignore branches matching the regex <re>
+    -j, --jobs <jobs>            Specifies  the  number  of jobs (commands) to run simultaneously. (Default $(nprocs))
     -m, --maxdepth <maxdepth>    Limit the depth of repositories search
 ```
