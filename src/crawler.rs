@@ -27,5 +27,7 @@ pub(crate) fn search_repositories(max_depth: usize) -> Vec<PathBuf> {
     }
     debug!("Done");
 
+    repo.sort();
+
     repo
 }
