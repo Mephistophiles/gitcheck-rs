@@ -1,7 +1,7 @@
 use crate::error::Result;
 
 use git2::{Repository, Status, StatusOptions};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub(crate) struct LocalChanges {
     pub(crate) modified: usize,
@@ -13,13 +13,18 @@ pub(crate) struct RemoteChanges {
 }
 
 // TODO: to &str
-pub(crate) struct Changeset {
-    path: PathBuf,
-    branch: String,
+pub(crate) struct Changeset<'a> {
+    path: &'a Path,
+    branch: &'a str,
     changes: Vec<Change>,
 }
 
-impl Changeset {
+pub(crate) enum Change {
+    Local(LocalChanges),
+    Remote(RemoteChanges),
+}
+
+impl<'a> Changeset<'a> {
     pub(crate) fn has_changes(&self) -> bool {
         !self.changes.is_empty()
     }
@@ -27,16 +32,11 @@ impl Changeset {
         &self.changes
     }
     pub(crate) fn path(&self) -> &Path {
-        &self.path
+        self.path
     }
     pub(crate) fn branch(&self) -> &str {
         &self.branch
     }
-}
-
-pub(crate) enum Change {
-    Local(LocalChanges),
-    Remote(RemoteChanges),
 }
 
 pub(crate) fn get_all_branches(repo: &Repository) -> Vec<String> {
@@ -107,10 +107,10 @@ fn check_local_changes(repo: &Repository, changeset: &mut Vec<Change>) -> Option
     Some(())
 }
 
-fn check_remote_changes(
+fn check_remote_changes<'a>(
     repo: &Repository,
-    branch: &str,
-    remote: &str,
+    branch: &'a str,
+    remote: &'a str,
     changeset: &mut Vec<Change>,
 ) -> Option<()> {
     let local = repo.revparse_single("HEAD").ok()?;
@@ -131,11 +131,11 @@ fn check_remote_changes(
     Some(())
 }
 
-pub(crate) fn check_repository(
-    repo: &Repository,
-    path: PathBuf,
-    branch: String,
-) -> Result<Changeset> {
+pub(crate) fn check_repository<'a, 'b>(
+    repo: &'b Repository,
+    path: &'a Path,
+    branch: &'a str,
+) -> Result<Changeset<'a>> {
     let mut changeset = vec![];
 
     check_local_changes(&repo, &mut changeset);
