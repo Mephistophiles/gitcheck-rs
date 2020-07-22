@@ -72,41 +72,23 @@ fn print_changes(pwd: &Path, changeset: Changeset) {
 }
 
 fn main() {
-    let matches = cmdline::parse_args();
+    let args = cmdline::parse_args();
 
-    if let Some(dir) = matches.value_of("dir") {
-        env::set_current_dir(dir).unwrap();
-    }
+    env::set_current_dir(&args.working_directory).unwrap();
 
-    if matches.is_present("debug") {
+    if args.debug {
         flexi_logger::Logger::with_str("debug").start().unwrap();
     } else {
         flexi_logger::Logger::with_env().start().unwrap();
     }
-    debug!("Global Vars: {:?}", env::args());
 
-    let quiet = matches.is_present("quiet");
+    let repos = crawler::search_repositories(args.max_depth);
 
-    let max_depth: usize = match matches.value_of("maxdepth") {
-        Some(i) => i.parse().unwrap(),
-        None => usize::MAX,
-    };
-
-    let repos = crawler::search_repositories(max_depth);
-    let ignore_branch_regex;
-    let check_all = matches.is_present("all-branch");
-
-    if let Some(j) = matches.value_of("jobs") {
+    if args.jobs > 0 {
         rayon::ThreadPoolBuilder::new()
-            .num_threads(j.parse().unwrap())
+            .num_threads(args.jobs)
             .build_global()
             .unwrap();
-    }
-
-    if let Some(li) = matches.value_of("ignore-branch") {
-        ignore_branch_regex = Some(regex::Regex::new(li).unwrap());
-    } else {
-        ignore_branch_regex = None;
     }
 
     debug!("Processing repositories... please wait.");
@@ -116,21 +98,21 @@ fn main() {
         let repo = git2::Repository::open(&path).unwrap();
         let branches;
 
-        if check_all {
+        if args.all_branch {
             branches = git::get_all_branches(&repo);
         } else {
             branches = git::get_default_branch(&repo);
         }
 
         for branch in branches {
-            if let Some(ref ignore_regex) = ignore_branch_regex {
+            if let Some(ref ignore_regex) = args.ignore_branch_regex {
                 if ignore_regex.is_match(&branch) {
                     continue;
                 }
             }
 
             if let Ok(changeset) = git::check_repository(&repo, &path, &branch) {
-                if !quiet || changeset.has_changes() {
+                if !args.quiet || changeset.has_changes() {
                     print_changes(&pwd, changeset);
                 }
             }

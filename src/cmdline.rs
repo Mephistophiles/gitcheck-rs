@@ -1,7 +1,21 @@
-use clap::{App, Arg, ArgMatches};
+use clap::{App, Arg};
+use regex::Regex;
+use std::env;
+use std::path::{Path, PathBuf};
 
-pub(crate) fn parse_args() -> ArgMatches {
-    App::new("gitcheck-rs")
+pub(crate) struct Options {
+    pub(crate) all_branch: bool,
+    pub(crate) debug: bool,
+    pub(crate) quiet: bool,
+    pub(crate) ignore_branch_regex: Option<Regex>,
+    pub(crate) working_directory: PathBuf,
+
+    pub(crate) max_depth: usize,
+    pub(crate) jobs: usize,
+}
+
+pub(crate) fn parse_args() -> Options {
+    let matches = App::new("gitcheck-rs")
         .version("0.0.1")
         .author("Maxim Zhukov")
         .about("rust gitcheck. Check multiple git repository in one pass")
@@ -105,5 +119,28 @@ pub(crate) fn parse_args() -> ArgMatches {
                 .takes_value(true)
                 .about("Specifies  the  number  of jobs (commands) to run simultaneously. (Default $(nprocs))"),
         )
-        .get_matches()
+        .get_matches();
+
+    Options {
+        all_branch: matches.is_present("all-branch"),
+        debug: matches.is_present("debug"),
+        quiet: matches.is_present("quiet"),
+
+        ignore_branch_regex: matches
+            .value_of("ignore-branch")
+            .and_then(|v| Regex::new(v).ok()),
+
+        working_directory: matches
+            .value_of("dir")
+            .and_then(|d| Path::new(d).canonicalize().ok())
+            .unwrap_or_else(|| env::current_dir().unwrap()),
+        max_depth: matches
+            .value_of("maxdepth")
+            .and_then(|m| m.parse().ok())
+            .unwrap_or(usize::MAX),
+        jobs: matches
+            .value_of("jobs")
+            .and_then(|j| j.parse().ok())
+            .unwrap_or(0),
+    }
 }
