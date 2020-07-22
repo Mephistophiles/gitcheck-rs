@@ -19,11 +19,10 @@ impl PathEntry {
     }
 }
 
-fn search_repositories_queue(
-    max_depth: usize,
-    pwd: &PathBuf,
-    repos: &mut Vec<PathBuf>,
-) -> Result<()> {
+fn search_repositories_queue<F>(max_depth: usize, pwd: &PathBuf, f: F) -> Result<()>
+where
+    F: Fn(&Path),
+{
     let mut queue = VecDeque::with_capacity(256);
 
     queue.push_back(PathEntry::new(pwd, 0));
@@ -42,9 +41,8 @@ fn search_repositories_queue(
             .filter(|e| e.file_type().unwrap().is_dir())
         {
             if entry.file_name() == ".git" {
-                let copy_pwd = path_entry.path.to_path_buf();
-                debug!("  Add {} repository", copy_pwd.display());
-                repos.push(copy_pwd);
+                debug!("  Add {} repository", path_entry.path.display());
+                f(&path_entry.path);
                 continue;
             }
 
@@ -59,16 +57,14 @@ fn search_repositories_queue(
     Ok(())
 }
 
-pub(crate) fn search_repositories(max_depth: usize) -> Vec<PathBuf> {
-    let mut repo = Vec::with_capacity(16);
+pub(crate) fn search_repositories<F>(max_depth: usize, f: F)
+where
+    F: Fn(&Path),
+{
     let pwd = env::current_dir().unwrap();
 
     debug!("Beginning scan... building list of git folders");
     debug!("  Scan git repositories from {}", pwd.display());
-    let _ = search_repositories_queue(max_depth, &pwd, &mut repo);
+    let _ = search_repositories_queue(max_depth, &pwd, f);
     debug!("Done");
-
-    repo.sort();
-
-    repo
 }

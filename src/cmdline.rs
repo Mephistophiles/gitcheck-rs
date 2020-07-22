@@ -3,6 +3,7 @@ use regex::Regex;
 use std::env;
 use std::path::{Path, PathBuf};
 
+#[derive(Clone)]
 pub(crate) struct Options {
     pub(crate) all_branch: bool,
     pub(crate) debug: bool,
@@ -141,6 +142,6 @@ pub(crate) fn parse_args() -> Options {
         jobs: matches
             .value_of("jobs")
             .and_then(|j| j.parse().ok())
-            .unwrap_or(0),
+            .unwrap_or_else(num_cpus::get),
     }
 }

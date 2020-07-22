@@ -3,10 +3,12 @@ use ansi_term::Colour::White;
 use crate::cmdline::Options;
 use crate::git::{Change, Changeset};
 
+use crossbeam_channel::{Receiver, Sender};
+use crossbeam_utils::sync::WaitGroup;
 use log::debug;
-use rayon::prelude::*;
 use std::env;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::thread;
 
 mod cmdline;
 mod colors;
@@ -108,18 +110,32 @@ fn main() {
         flexi_logger::Logger::with_env().start().unwrap();
     }
 
-    let repos = crawler::search_repositories(args.max_depth);
+    // Create a channel of unbounded capacity.
+    let (tx, rx): (Sender<PathBuf>, Receiver<PathBuf>) = crossbeam_channel::unbounded();
 
-    if args.jobs > 0 {
-        rayon::ThreadPoolBuilder::new()
-            .num_threads(args.jobs)
-            .build_global()
-            .unwrap();
-    }
+    // Create a new wait group.
+    let wg = WaitGroup::new();
 
     debug!("Processing repositories... please wait.");
 
-    repos.par_iter().for_each(|path| {
-        process_repo(&path, &args);
+    for _ in 0..args.jobs {
+        let rx = rx.clone();
+        let wg = wg.clone();
+        let args = args.clone();
+
+        thread::spawn(move || {
+            for path in rx.iter() {
+                process_repo(&path, &args);
+            }
+
+            drop(wg);
+        });
+    }
+
+    crawler::search_repositories(args.max_depth, |path| {
+        tx.send(path.to_path_buf()).unwrap();
     });
+    drop(tx);
+
+    wg.wait();
 }
