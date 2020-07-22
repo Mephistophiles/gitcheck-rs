@@ -1,30 +1,58 @@
 use crate::error::Result;
 use log::debug;
+use std::collections::VecDeque;
 use std::env;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
-fn search_repositories_iter(
-    current_depth: usize,
+struct PathEntry {
+    path: PathBuf,
+    depth: usize,
+}
+
+impl PathEntry {
+    fn new(path: &Path, depth: usize) -> PathEntry {
+        PathEntry {
+            path: path.to_path_buf(),
+            depth,
+        }
+    }
+}
+
+fn search_repositories_queue(
     max_depth: usize,
-    pwd: &mut PathBuf,
+    pwd: &PathBuf,
     repos: &mut Vec<PathBuf>,
 ) -> Result<()> {
-    for entry in fs::read_dir(&pwd)?.filter_map(|e| e.ok()) {
-        if !entry.file_type()?.is_dir() {
-            continue;
+    let mut queue = VecDeque::with_capacity(256);
+
+    queue.push_back(PathEntry::new(pwd, 0));
+
+    loop {
+        if queue.is_empty() {
+            break;
         }
 
-        if entry.file_name() == ".git" {
-            let copy_pwd = pwd.to_path_buf();
-            debug!("  Add {} repository", copy_pwd.display());
-            repos.push(copy_pwd);
-        }
+        let mut path_entry = queue.pop_front().unwrap();
 
-        if current_depth < max_depth {
-            pwd.push(entry.file_name());
-            let _ = search_repositories_iter(current_depth + 1, max_depth, pwd, repos);
-            pwd.pop();
+        assert!(path_entry.depth <= max_depth);
+
+        for entry in fs::read_dir(&path_entry.path)?
+            .filter_map(|e| e.ok())
+            .filter(|e| e.file_type().unwrap().is_dir())
+        {
+            if entry.file_name() == ".git" {
+                let copy_pwd = path_entry.path.to_path_buf();
+                debug!("  Add {} repository", copy_pwd.display());
+                repos.push(copy_pwd);
+                continue;
+            }
+
+            if path_entry.depth < max_depth {
+                path_entry.path.push(entry.file_name());
+                queue.push_back(PathEntry::new(&path_entry.path, path_entry.depth + 1));
+                path_entry.path.pop();
+            }
         }
     }
 
@@ -33,11 +61,11 @@ fn search_repositories_iter(
 
 pub(crate) fn search_repositories(max_depth: usize) -> Vec<PathBuf> {
     let mut repo = Vec::with_capacity(16);
-    let mut pwd = env::current_dir().unwrap();
+    let pwd = env::current_dir().unwrap();
 
     debug!("Beginning scan... building list of git folders");
     debug!("  Scan git repositories from {}", pwd.display());
-    let _ = search_repositories_iter(0, max_depth, &mut pwd, &mut repo);
+    let _ = search_repositories_queue(max_depth, &pwd, &mut repo);
     debug!("Done");
 
     repo.sort();
