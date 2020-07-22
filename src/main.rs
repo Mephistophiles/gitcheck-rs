@@ -1,11 +1,12 @@
 use ansi_term::Colour::White;
 
+use crate::cmdline::Options;
 use crate::git::{Change, Changeset};
 
 use log::debug;
 use rayon::prelude::*;
 use std::env;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 mod cmdline;
 mod colors;
@@ -71,6 +72,31 @@ fn print_changes(pwd: &Path, changeset: Changeset) {
     println!();
 }
 
+fn process_repo(path: &Path, args: &Options) {
+    let repo = git2::Repository::open(path).unwrap();
+    let branches;
+
+    if args.all_branch {
+        branches = git::get_all_branches(&repo);
+    } else {
+        branches = git::get_default_branch(&repo);
+    }
+
+    for branch in branches {
+        if let Some(ref ignore_regex) = args.ignore_branch_regex {
+            if ignore_regex.is_match(&branch) {
+                continue;
+            }
+        }
+
+        if let Ok(changeset) = git::check_repository(&repo, path, &branch) {
+            if !args.quiet || changeset.has_changes() {
+                print_changes(&args.working_directory, changeset);
+            }
+        }
+    }
+}
+
 fn main() {
     let args = cmdline::parse_args();
 
@@ -92,30 +118,8 @@ fn main() {
     }
 
     debug!("Processing repositories... please wait.");
-    let pwd = env::current_dir().unwrap_or_else(|_| PathBuf::from("/"));
 
     repos.par_iter().for_each(|path| {
-        let repo = git2::Repository::open(&path).unwrap();
-        let branches;
-
-        if args.all_branch {
-            branches = git::get_all_branches(&repo);
-        } else {
-            branches = git::get_default_branch(&repo);
-        }
-
-        for branch in branches {
-            if let Some(ref ignore_regex) = args.ignore_branch_regex {
-                if ignore_regex.is_match(&branch) {
-                    continue;
-                }
-            }
-
-            if let Ok(changeset) = git::check_repository(&repo, &path, &branch) {
-                if !args.quiet || changeset.has_changes() {
-                    print_changes(&pwd, changeset);
-                }
-            }
-        }
+        process_repo(&path, &args);
     });
 }
