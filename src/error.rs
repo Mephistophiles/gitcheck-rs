@@ -4,6 +4,7 @@ pub(crate) type Result<T> = std::result::Result<T, Error>;
 pub(crate) enum Error {
     GitError(git2::Error),
     IOError(std::io::Error),
+    Crawler(jwalk::Error),
 }
 
 impl From<git2::Error> for Error {
@@ -14,5 +15,10 @@ impl From<git2::Error> for Error {
 impl From<std::io::Error> for Error {
     fn from(e: std::io::Error) -> Self {
         Error::IOError(e)
+    }
+}
+impl From<jwalk::Error> for Error {
+    fn from(e: jwalk::Error) -> Self {
+        Error::Crawler(e)
     }
 }

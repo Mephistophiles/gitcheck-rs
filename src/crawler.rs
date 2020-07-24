@@ -1,56 +1,60 @@
 use crate::error::Result;
+use jwalk::WalkDir;
 use log::debug;
-use std::collections::VecDeque;
 use std::env;
-use std::fs;
 use std::path::{Path, PathBuf};
 
-struct PathEntry {
-    path: PathBuf,
-    depth: usize,
-}
-
-impl PathEntry {
-    fn new(path: &Path, depth: usize) -> PathEntry {
-        PathEntry {
-            path: path.to_path_buf(),
-            depth,
-        }
-    }
-}
-
-fn search_repositories_queue<F>(max_depth: usize, pwd: &PathBuf, f: F) -> Result<()>
+fn search_repositories_parallel<F>(max_depth: usize, pwd: &PathBuf, f: F) -> Result<()>
 where
     F: Fn(&Path),
 {
-    let mut queue = VecDeque::with_capacity(256);
+    let walker = WalkDir::new(pwd)
+        .skip_hidden(false)
+        .max_depth(max_depth)
+        .process_read_dir(move |_read_dir_state, children| {
+            children.retain(|dir_entry_result| {
+                dir_entry_result
+                    .as_ref()
+                    .map(|dir_entry| {
+                        if !dir_entry.file_type.is_dir() {
+                            return false;
+                        }
 
-    queue.push_back(PathEntry::new(pwd, 0));
+                        if let Some(file_name) = dir_entry.file_name().to_str() {
+                            if file_name.starts_with('.') && file_name != ".git" {
+                                return false;
+                            }
 
-    loop {
-        if queue.is_empty() {
-            break;
-        }
+                            return true;
+                        } else {
+                            false
+                        }
+                    })
+                    .unwrap_or(false)
+            });
 
-        let mut path_entry = queue.pop_front().unwrap();
+            children.iter_mut().for_each(|dir_entry_result| {
+                if let Ok(dir_entry) = dir_entry_result {
+                    // reached maximum depth
+                    if dir_entry.depth == max_depth {
+                        dir_entry.read_children_path = None;
+                    }
 
-        assert!(path_entry.depth <= max_depth);
+                    // in .git folder nothing to show
+                    if dir_entry.file_name == ".git" {
+                        dir_entry.read_children_path = None;
+                    }
+                }
+            });
+        });
 
-        for entry in fs::read_dir(&path_entry.path)?
-            .filter_map(|e| e.ok())
-            .filter(|e| e.file_type().unwrap().is_dir())
-        {
-            if entry.file_name() == ".git" {
-                debug!("  Add {} repository", path_entry.path.display());
-                f(&path_entry.path);
-                continue;
-            }
+    for entry in walker {
+        let entry = entry?;
 
-            if path_entry.depth < max_depth {
-                path_entry.path.push(entry.file_name());
-                queue.push_back(PathEntry::new(&path_entry.path, path_entry.depth + 1));
-                path_entry.path.pop();
-            }
+        if entry.file_name() == ".git" {
+            let parent = entry.parent_path();
+            debug!("  Add {} repository", parent.display());
+            f(parent);
         }
     }
 
@@ -65,6 +69,6 @@ where
 
     debug!("Beginning scan... building list of git folders");
     debug!("  Scan git repositories from {}", pwd.display());
-    let _ = search_repositories_queue(max_depth, &pwd, f);
+    let _ = search_repositories_parallel(max_depth, &pwd, f);
     debug!("Done");
 }
