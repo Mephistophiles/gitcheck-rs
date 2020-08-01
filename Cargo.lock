@@ -210,7 +210,7 @@ dependencies = [
 
 [[package]]
 name = "gitcheck"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "ansi_term",
  "clap",
@@ -435,9 +435,9 @@ dependencies = [
 
 [[package]]
 name = "os_str_bytes"
-version = "2.3.1"
+version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06de47b848347d8c4c94219ad8ecd35eb90231704b067e67e6ae2e36ee023510"
+checksum = "2ac6fe3538f701e339953a3ebbe4f39941aababa8a3f6964635b24ab526daeac"
 
 [[package]]
 name = "percent-encoding"
