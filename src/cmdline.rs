@@ -1,4 +1,4 @@
-use clap::{App, AppSettings, Arg};
+use clap::{crate_version, App, AppSettings, Arg};
 use regex::Regex;
 use std::env;
 use std::path::{Path, PathBuf};
@@ -17,7 +17,7 @@ pub(crate) struct Options {
 
 pub(crate) fn parse_args() -> Options {
     let matches = App::new("gitcheck-rs")
-        .version("0.0.1")
+        .version(crate_version!())
         .author("Maxim Zhukov")
         .setting(AppSettings::ColoredHelp)
         .about("rust gitcheck. Check multiple git repository in one pass")
