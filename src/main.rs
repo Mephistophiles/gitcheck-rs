@@ -91,7 +91,7 @@ fn process_repo(path: &Path, args: &Options) {
             }
         }
 
-        if let Ok(changeset) = git::check_repository(&repo, path, &branch) {
+        if let Ok(changeset) = git::check_repository(&repo, path, &branch, &args) {
             if !args.quiet || changeset.has_changes() {
                 print_changes(&args.working_directory, changeset);
             }

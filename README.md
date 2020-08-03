@@ -47,6 +47,7 @@ FLAGS:
         --debug         Show debug message
     -h, --help          Prints help information
     -q, --quiet         Display info only when repository needs action
+    -u, --untracked     Show untracked files
     -V, --version       Prints version information
 
 OPTIONS:
