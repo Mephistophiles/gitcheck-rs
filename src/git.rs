@@ -73,12 +73,15 @@ pub(crate) fn get_default_branch(repo: &Repository) -> Vec<String> {
     branch_out
 }
 
-fn check_local_changes(repo: &Repository, changeset: &mut Vec<Change>) -> Option<()> {
+fn check_local_changes(
+    repo: &Repository,
+    changeset: &mut Vec<Change>,
+    args: &crate::Options,
+) -> Option<()> {
     let mut status_opts = StatusOptions::new();
 
-    if false {
+    if args.untracked {
         status_opts.include_untracked(true);
-        todo!();
     }
 
     let statuses = repo.statuses(Some(&mut status_opts)).ok()?;
@@ -94,6 +97,7 @@ fn check_local_changes(repo: &Repository, changeset: &mut Vec<Change>) -> Option
                     | Status::INDEX_RENAMED
                     | Status::INDEX_TYPECHANGE
                     | Status::WT_MODIFIED
+                    | Status::WT_NEW
                     | Status::WT_RENAMED
                     | Status::WT_TYPECHANGE,
             )
@@ -135,10 +139,11 @@ pub(crate) fn check_repository<'a, 'b>(
     repo: &'b Repository,
     path: &'a Path,
     branch: &'a str,
+    args: &crate::Options,
 ) -> Result<Changeset<'a>> {
     let mut changeset = vec![];
 
-    check_local_changes(&repo, &mut changeset);
+    check_local_changes(&repo, &mut changeset, args);
 
     let remotes = repo.remotes()?;
     for remote in remotes.iter().filter_map(|r| r) {
