@@ -12,14 +12,14 @@ cargo install --git https://github.com/Mephistophiles/gitcheck-rs
 
 # Repository status
 
-This repository is currently in WIP (Work-In-Progress) state. At this moment released:
-* Basic functionality
-* Setup maximum depth
-* Select directory `--dir`
-* Select ignored git branches `--ignore-branch`
+This repository is currently in WIP (Work-In-Progress) state.
 
 # TODO
 
+ - [X] Basic functionality
+ - [X] Select directory (`--dir`)
+ - [X] Ignore selected git branches (`--ignore-branch`)
+ - [X] setup max depth (`--max-depth`)
  - [X] Quiet mode (`--quiet`)
  - [ ] Verbose output (`--verbose`)
  - [ ] Fetch repositories (`--remote`)
@@ -35,7 +35,7 @@ This repository is currently in WIP (Work-In-Progress) state. At this moment rel
 # Options
 
 ```
-gitcheck-rs 0.0.1
+gitcheck-rs 0.0.2
 Maxim Zhukov
 rust gitcheck. Check multiple git repository in one pass
 
