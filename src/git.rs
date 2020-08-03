@@ -28,7 +28,6 @@ pub(crate) struct RemoteChanges {
     pub(crate) behind: usize,
 }
 
-// TODO: to &str
 pub(crate) struct Changeset<'a> {
     path: &'a Path,
     branch: &'a str,
