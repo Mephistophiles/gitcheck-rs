@@ -1,8 +1,30 @@
 use crate::error::Result;
-use jwalk::WalkDir;
+use jwalk::{ClientState, DirEntry, WalkDir};
 use log::debug;
 use std::env;
 use std::path::Path;
+
+fn filter_path<C: ClientState>(dir_entry: &jwalk::Result<DirEntry<C>>) -> bool {
+    let dir_entry = match dir_entry {
+        Ok(e) => e,
+        Err(_) => return false,
+    };
+
+    if !dir_entry.file_type.is_dir() {
+        return false;
+    }
+
+    let file_name = match dir_entry.file_name().to_str() {
+        Some(f) => f,
+        None => return false,
+    };
+
+    if file_name.starts_with('.') && file_name != ".git" {
+        return false;
+    }
+
+    true
+}
 
 fn search_repositories_parallel<F>(max_depth: usize, pwd: &Path, f: F) -> Result<()>
 where
@@ -12,26 +34,7 @@ where
         .skip_hidden(false)
         .max_depth(max_depth)
         .process_read_dir(move |_read_dir_state, children| {
-            children.retain(|dir_entry_result| {
-                dir_entry_result
-                    .as_ref()
-                    .map(|dir_entry| {
-                        if !dir_entry.file_type.is_dir() {
-                            return false;
-                        }
-
-                        if let Some(file_name) = dir_entry.file_name().to_str() {
-                            if file_name.starts_with('.') && file_name != ".git" {
-                                return false;
-                            }
-
-                            true
-                        } else {
-                            false
-                        }
-                    })
-                    .unwrap_or(false)
-            });
+            children.retain(filter_path);
 
             children.iter_mut().for_each(|dir_entry_result| {
                 if let Ok(dir_entry) = dir_entry_result {
