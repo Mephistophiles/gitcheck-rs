@@ -53,18 +53,17 @@ jobs:
         override: true
         components: rustfmt, rust-src
 
-    - if: matrix.os == 'ubuntu-latest'
-      run: sudo chown -R $(whoami):$(id -ng) ~/.cargo/
+#    - if: matrix.os == 'ubuntu-latest'
+#      run: sudo chown -R $(whoami):$(id -ng) ~/.cargo/
 
-
-    - name: Cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+#    - name: Cache
+#      uses: actions/cache@v2
+#      with:
+#        path: |
+#          ~/.cargo/registry
+#          ~/.cargo/git
+#          target
+#        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
     - name: Compile
       run: cargo test --no-run --locked
