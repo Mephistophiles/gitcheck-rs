@@ -23,7 +23,7 @@ This repository is currently in WIP (Work-In-Progress) state.
  - [X] Quiet mode (`--quiet`)
  - [ ] Verbose output (`--verbose`)
  - [ ] Fetch repositories (`--remote`)
- - [ ] Check untracked files (`--untracked`)
+ - [X] Check untracked files (`--untracked`)
  - [X] All branch mode (`--all-branch`)
  - [ ] Support ignore list (`--localignore`)
  - [ ] Terminal bell on repository changes (`--bell`)
@@ -35,7 +35,7 @@ This repository is currently in WIP (Work-In-Progress) state.
 # Options
 
 ```
-gitcheck-rs 0.0.2
+gitcheck-rs 0.0.3
 Maxim Zhukov
 rust gitcheck. Check multiple git repository in one pass
 
