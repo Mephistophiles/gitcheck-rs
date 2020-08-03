@@ -2,9 +2,9 @@ use crate::error::Result;
 use jwalk::WalkDir;
 use log::debug;
 use std::env;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
-fn search_repositories_parallel<F>(max_depth: usize, pwd: &PathBuf, f: F) -> Result<()>
+fn search_repositories_parallel<F>(max_depth: usize, pwd: &Path, f: F) -> Result<()>
 where
     F: Fn(&Path),
 {
