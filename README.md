@@ -22,7 +22,7 @@ This repository is currently in WIP (Work-In-Progress) state.
  - [X] setup max depth (`--max-depth`)
  - [X] Quiet mode (`--quiet`)
  - [ ] Verbose output (`--verbose`)
- - [ ] Fetch repositories (`--remote`)
+ - [X] Fetch repositories (`--remote`)
  - [X] Check untracked files (`--untracked`)
  - [X] All branch mode (`--all-branch`)
  - [ ] Support ignore list (`--localignore`)
@@ -47,6 +47,7 @@ FLAGS:
         --debug         Show debug message
     -h, --help          Prints help information
     -q, --quiet         Display info only when repository needs action
+    -r, --remote        force remote update (slow)
     -u, --untracked     Show untracked files
     -V, --version       Prints version information
 

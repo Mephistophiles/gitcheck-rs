@@ -3,6 +3,7 @@ use ansi_term::Colour::White;
 use crate::cmdline::Options;
 use crate::git::{Change, Changeset};
 
+use crate::error::Result;
 use crossbeam_channel::{Receiver, Sender};
 use crossbeam_utils::sync::WaitGroup;
 use log::debug;
@@ -15,6 +16,34 @@ mod colors;
 mod crawler;
 mod error;
 mod git;
+
+macro_rules! system {
+    ( $( $cmd:expr, $( $arg:expr),*)=>+ ) => {{
+        let mut handle: Option<std::process::Child> = None;
+
+        $(
+            let mut command = std::process::Command::new($cmd);
+
+            $(
+                command.arg($arg);
+            )*
+
+            if let Some(handle) = handle {
+                // stdin = Some(handle.stdout.ok_or("invalid stdout")?);
+                command.stdin(handle.stdout.expect("invalid stdout"));
+            }
+
+            command.stdout(std::process::Stdio::piped());
+
+            handle = Some(command.spawn()?);
+        )+
+
+
+        let output = handle.unwrap().wait_with_output()?;
+
+        String::from_utf8(output.stdout)?
+    }};
+}
 
 fn report_modified_repo(path: &Path, branch: &str) {
     print!(
@@ -74,9 +103,24 @@ fn print_changes(pwd: &Path, changeset: Changeset) {
     println!();
 }
 
+fn update_remote(path: &Path) -> Result<()> {
+    debug!("Updating {} remotes...", path.display());
+
+    system!("git", "-C", path, "remote", "update");
+
+    Ok(())
+}
+
 fn process_repo(path: &Path, args: &Options) {
     let repo = git2::Repository::open(path).unwrap();
     let branches;
+
+    if args.remote {
+        match update_remote(path) {
+            Ok(_) => (),
+            Err(e) => eprintln!("Update error: {}", e),
+        }
+    }
 
     if args.all_branch {
         branches = git::get_all_branches(&repo);
