@@ -18,7 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: rust-audit-check
       uses: actions-rs/audit-check@v1.2.0
       with:
@@ -36,6 +38,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     # We need to disable the existing toolchain to avoid updating rust-docs
     # which takes a long time. The fastest way to do this is to rename the
@@ -78,6 +82,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: actions-rs/toolchain@v1
       with:
           toolchain: nightly
