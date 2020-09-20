@@ -39,36 +39,36 @@ pub(crate) fn parse_args() -> Options {
         .setting(AppSettings::ColoredHelp)
         .about("rust gitcheck. Check multiple git repository in one pass")
         // .arg(
-        //     Arg::with_name("verbose")
+        //     Arg::new("verbose")
         //         .short('v')
         //         .long("verbose")
         //         .about("Show files & commits"),
         // )
         .arg(
-            Arg::with_name("debug")
+            Arg::new("debug")
                 .long("debug")
                 .about("Show debug message"),
         )
         // .arg(
-        //     Arg::with_name("remote")
+        //     Arg::new("remote")
         //         .short('r')
         //         .long("remote")
         //         .about("force remote update (slow)"),
         // )
         .arg(
-            Arg::with_name("untracked")
+            Arg::new("untracked")
                 .short('u')
                 .long("untracked")
                 .about("Show untracked files"),
         )
         // .arg(
-        //     Arg::with_name("bell")
+        //     Arg::new("bell")
         //         .short('b')
         //         .long("bell")
         //         .about("bell on action needed"),
         // )
         // .arg(
-        //     Arg::with_name("watch")
+        //     Arg::new("watch")
         //         .short('w')
         //         .long("watch")
         //         .value_name("sec")
@@ -76,7 +76,7 @@ pub(crate) fn parse_args() -> Options {
         //         .about("after displaying, wait <sec> and run again"),
         // )
         .arg(
-            Arg::with_name("ignore-branch")
+            Arg::new("ignore-branch")
                 .short('i')
                 .long("ignore-branch")
                 .value_name("re")
@@ -84,7 +84,7 @@ pub(crate) fn parse_args() -> Options {
                 .about("ignore branches matching the regex <re>"),
         )
         .arg(
-            Arg::with_name("dir")
+            Arg::new("dir")
                 .short('d')
                 .long("dir")
                 .value_name("dir")
@@ -92,7 +92,7 @@ pub(crate) fn parse_args() -> Options {
                 .about("Search <dir> for repositories (can be used multiple times)"),
         )
         .arg(
-            Arg::with_name("maxdepth")
+            Arg::new("maxdepth")
                 .short('m')
                 .long("maxdepth")
                 .value_name("maxdepth")
@@ -100,25 +100,25 @@ pub(crate) fn parse_args() -> Options {
                 .about("Limit the depth of repositories search"),
         )
         .arg(
-            Arg::with_name("quiet")
+            Arg::new("quiet")
                 .short('q')
                 .long("quiet")
                 .about("Display info only when repository needs action"),
         )
         // .arg(
-        //     Arg::with_name("email")
+        //     Arg::new("email")
         //         .short('e')
         //         .long("email")
         //         .about("Send an email with result as html, using mail.properties parameters"),
         // )
         .arg(
-            Arg::with_name("all-branch")
+            Arg::new("all-branch")
                 .short('a')
                 .long("all-branch")
                 .about("Show the status of all branches"),
         )
         // .arg(
-        //     Arg::with_name("localignore")
+        //     Arg::new("localignore")
         //         .short('l')
         //         .long("localignore")
         //         .value_name("re")
@@ -126,12 +126,12 @@ pub(crate) fn parse_args() -> Options {
         //         .about("ignore changes in local files which match the regex <re>"),
         // )
         // .arg(
-        //     Arg::with_name("init-email").long("init-email").about(
+        //     Arg::new("init-email").long("init-email").about(
         //         "Initialize mail.properties file (has to be modified by user using JSON Format",
         //     ),
         // )
         .arg(
-            Arg::with_name("jobs")
+            Arg::new("jobs")
                 .short('j')
                 .long("jobs")
                 .value_name("jobs")
