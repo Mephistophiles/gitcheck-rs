@@ -49,7 +49,7 @@ where
     let walker = WalkDir::new(pwd)
         .skip_hidden(false)
         .max_depth(max_depth)
-        .process_read_dir(move |_read_dir_state, children| {
+        .process_read_dir(move |_, _, _, children| {
             children.retain(filter_path);
 
             children.iter_mut().for_each(|dir_entry_result| {
