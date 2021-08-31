@@ -19,6 +19,8 @@ use ansi_term::Colour::White;
 use crate::cmdline::Options;
 use crate::git::{Change, Changeset};
 
+use subprocess::Exec;
+use crate::error::Result;
 use crossbeam_channel::{Receiver, Sender};
 use crossbeam_utils::sync::WaitGroup;
 use log::debug;
@@ -31,6 +33,7 @@ mod colors;
 mod crawler;
 mod error;
 mod git;
+
 
 fn report_modified_repo(path: &Path, branch: &str) {
     print!(
@@ -90,9 +93,28 @@ fn print_changes(pwd: &Path, changeset: Changeset) {
     println!();
 }
 
+fn git(path: &Path) -> Exec {
+    Exec::cmd("git").arg("-C").arg(path)
+}
+
+fn update_remote(path: &Path) -> Result<()> {
+    debug!("Updating {} remotes...", path.display());
+
+    git(path).args(&["remote", "update"]).join().unwrap();
+
+    Ok(())
+}
+
 fn process_repo(path: &Path, args: &Options) {
     let repo = git2::Repository::open(path).unwrap();
     let branches;
+
+    if args.remote {
+        match update_remote(path) {
+            Ok(_) => (),
+            Err(e) => eprintln!("Update error: {}", e),
+        }
+    }
 
     if args.all_branch {
         branches = git::get_all_branches(&repo);

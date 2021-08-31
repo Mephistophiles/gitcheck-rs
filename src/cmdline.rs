@@ -24,6 +24,7 @@ pub(crate) struct Options {
     pub(crate) all_branch: bool,
     pub(crate) debug: bool,
     pub(crate) quiet: bool,
+    pub(crate) remote: bool,
     pub(crate) untracked: bool,
     pub(crate) ignore_branch_regex: Option<Regex>,
     pub(crate) working_directory: PathBuf,
@@ -49,12 +50,12 @@ pub(crate) fn parse_args() -> Options {
                 .long("debug")
                 .about("Show debug message"),
         )
-        // .arg(
-        //     Arg::new("remote")
-        //         .short('r')
-        //         .long("remote")
-        //         .about("force remote update (slow)"),
-        // )
+        .arg(
+            Arg::new("remote")
+                .short('r')
+                .long("remote")
+                .about("force remote update (slow)"),
+        )
         .arg(
             Arg::new("untracked")
                 .short('u')
@@ -144,6 +145,7 @@ pub(crate) fn parse_args() -> Options {
         all_branch: matches.is_present("all-branch"),
         debug: matches.is_present("debug"),
         quiet: matches.is_present("quiet"),
+        remote: matches.is_present("remote"),
         untracked: matches.is_present("untracked"),
 
         ignore_branch_regex: matches
