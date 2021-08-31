@@ -120,11 +120,10 @@ fn main() {
 
     env::set_current_dir(&args.working_directory).unwrap();
 
-    if args.debug {
-        flexi_logger::Logger::with_str("debug").start().unwrap();
-    } else {
-        flexi_logger::Logger::with_env().start().unwrap();
-    }
+    flexi_logger::Logger::try_with_env_or_str(if args.debug { "debug" } else { "info" })
+        .unwrap()
+        .start()
+        .unwrap();
 
     // Create a channel of unbounded capacity.
     let (tx, rx): (Sender<PathBuf>, Receiver<PathBuf>) = crossbeam_channel::unbounded();
