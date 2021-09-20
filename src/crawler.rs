@@ -17,8 +17,7 @@
 use crate::error::Result;
 use jwalk::{ClientState, DirEntry, WalkDir};
 use log::debug;
-use std::env;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 fn filter_path<C: ClientState>(dir_entry: &jwalk::Result<DirEntry<C>>) -> bool {
     let dir_entry = match dir_entry {
@@ -44,7 +43,7 @@ fn filter_path<C: ClientState>(dir_entry: &jwalk::Result<DirEntry<C>>) -> bool {
 
 fn search_repositories_parallel<F>(max_depth: usize, pwd: &Path, f: F) -> Result<()>
 where
-    F: Fn(&Path),
+    F: Fn(PathBuf),
 {
     let walker = WalkDir::new(pwd)
         .skip_hidden(false)
@@ -73,21 +72,19 @@ where
         if entry.file_name() == ".git" {
             let parent = entry.parent_path();
             debug!("  Add {} repository", parent.display());
-            f(parent);
+            f(parent.to_path_buf());
         }
     }
 
     Ok(())
 }
 
-pub(crate) fn search_repositories<F>(max_depth: usize, f: F)
+pub(crate) fn search_repositories<F>(max_depth: usize, pwd: &Path, f: F)
 where
-    F: Fn(&Path),
+    F: Fn(PathBuf),
 {
-    let pwd = env::current_dir().unwrap();
-
     debug!("Beginning scan... building list of git folders");
     debug!("  Scan git repositories from {}", pwd.display());
-    let _ = search_repositories_parallel(max_depth, &pwd, f);
+    let _ = search_repositories_parallel(max_depth, pwd, f);
     debug!("Done");
 }

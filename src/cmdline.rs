@@ -27,7 +27,7 @@ pub(crate) struct Options {
     pub(crate) remote: bool,
     pub(crate) untracked: bool,
     pub(crate) ignore_branch_regex: Option<Regex>,
-    pub(crate) working_directory: PathBuf,
+    pub(crate) working_directories: Vec<PathBuf>,
 
     pub(crate) max_depth: usize,
     pub(crate) jobs: usize,
@@ -90,6 +90,7 @@ pub(crate) fn parse_args() -> Options {
                 .long("dir")
                 .value_name("dir")
                 .takes_value(true)
+                .multiple_values(true)
                 .about("Search <dir> for repositories (can be used multiple times)"),
         )
         .arg(
@@ -152,10 +153,14 @@ pub(crate) fn parse_args() -> Options {
             .value_of("ignore-branch")
             .and_then(|v| Regex::new(v).ok()),
 
-        working_directory: matches
-            .value_of("dir")
-            .and_then(|d| Path::new(d).canonicalize().ok())
-            .unwrap_or_else(|| env::current_dir().unwrap()),
+        working_directories: matches
+            .values_of("dir")
+            .map(|values| {
+                values
+                    .map(|d| Path::new(d).canonicalize().unwrap())
+                    .collect()
+            })
+            .unwrap_or_else(|| vec![env::current_dir().unwrap()]),
         max_depth: matches
             .value_of("maxdepth")
             .and_then(|m| m.parse().ok())

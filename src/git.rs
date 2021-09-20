@@ -50,7 +50,7 @@ impl<'a> Changeset<'a> {
         self.path
     }
     pub(crate) fn branch(&self) -> &str {
-        &self.branch
+        self.branch
     }
 }
 
@@ -158,11 +158,11 @@ pub(crate) fn check_repository<'a, 'b>(
 ) -> Result<Changeset<'a>> {
     let mut changeset = vec![];
 
-    check_local_changes(&repo, &mut changeset, args);
+    check_local_changes(repo, &mut changeset, args);
 
     let remotes = repo.remotes()?;
-    for remote in remotes.iter().filter_map(|r| r) {
-        check_remote_changes(&repo, &branch, remote, &mut changeset);
+    for remote in remotes.iter().flatten() {
+        check_remote_changes(repo, branch, remote, &mut changeset);
     }
 
     Ok(Changeset {
