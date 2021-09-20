@@ -19,21 +19,19 @@ use ansi_term::Colour::White;
 use crate::cmdline::Options;
 use crate::git::{Change, Changeset};
 
-use subprocess::Exec;
 use crate::error::Result;
 use crossbeam_channel::{Receiver, Sender};
 use crossbeam_utils::sync::WaitGroup;
 use log::debug;
-use std::env;
 use std::path::{Path, PathBuf};
 use std::thread;
+use xshell::cmd;
 
 mod cmdline;
 mod colors;
 mod crawler;
 mod error;
 mod git;
-
 
 fn report_modified_repo(path: &Path, branch: &str) {
     print!(
@@ -93,14 +91,10 @@ fn print_changes(pwd: &Path, changeset: Changeset) {
     println!();
 }
 
-fn git(path: &Path) -> Exec {
-    Exec::cmd("git").arg("-C").arg(path)
-}
-
 fn update_remote(path: &Path) -> Result<()> {
     debug!("Updating {} remotes...", path.display());
 
-    git(path).args(&["remote", "update"]).join().unwrap();
+    cmd!("git -C {path} remote update").run().unwrap();
 
     Ok(())
 }
@@ -129,9 +123,9 @@ fn process_repo(path: &Path, args: &Options) {
             }
         }
 
-        if let Ok(changeset) = git::check_repository(&repo, path, &branch, &args) {
+        if let Ok(changeset) = git::check_repository(&repo, path, &branch, args) {
             if !args.quiet || changeset.has_changes() {
-                print_changes(&args.working_directory, changeset);
+                print_changes(path, changeset);
             }
         }
     }
@@ -139,8 +133,6 @@ fn process_repo(path: &Path, args: &Options) {
 
 fn main() {
     let args = cmdline::parse_args();
-
-    env::set_current_dir(&args.working_directory).unwrap();
 
     flexi_logger::Logger::try_with_env_or_str(if args.debug { "debug" } else { "info" })
         .unwrap()
@@ -169,9 +161,11 @@ fn main() {
         });
     }
 
-    crawler::search_repositories(args.max_depth, |path| {
-        tx.send(path.to_path_buf()).unwrap();
-    });
+    for dir in args.working_directories {
+        crawler::search_repositories(args.max_depth, &dir, |path| {
+            tx.send(path).unwrap();
+        });
+    }
     drop(tx);
 
     wg.wait();
