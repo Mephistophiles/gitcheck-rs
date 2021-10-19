@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-use clap::{crate_version, App, AppSettings, Arg};
+use clap::{crate_version, App, Arg, ColorChoice};
 use regex::Regex;
 use std::env;
 use std::path::{Path, PathBuf};
@@ -37,7 +37,7 @@ pub(crate) fn parse_args() -> Options {
     let matches = App::new("gitcheck-rs")
         .version(crate_version!())
         .author("Maxim Zhukov")
-        .setting(AppSettings::ColoredHelp)
+        .color(ColorChoice::Auto)
         .about("rust gitcheck. Check multiple git repository in one pass")
         // .arg(
         //     Arg::new("verbose")
