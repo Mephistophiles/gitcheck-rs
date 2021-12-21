@@ -17,7 +17,7 @@ flexi_logger = "0.20"
 git2 = "0.13"
 jwalk = "0.6.0"
 log = "0.4"
-num_cpus = "1.13.0"
+num_cpus = "1.13.1"
 regex = "1.4.2"
 xshell = "0.1.17"
 
