@@ -25,7 +25,7 @@ use crossbeam_utils::sync::WaitGroup;
 use log::debug;
 use std::path::{Path, PathBuf};
 use std::thread;
-use xshell::cmd;
+use xshell::{cmd, Shell};
 
 mod cmdline;
 mod colors;
@@ -93,15 +93,15 @@ fn print_changes(pwd: &Path, changeset: Changeset) {
 
 fn update_remote(path: &Path) -> Result<()> {
     debug!("Updating {} remotes...", path.display());
+    let sh = Shell::new()?;
 
-    cmd!("git -C {path} remote update").run().unwrap();
+    cmd!(sh, "git -C {path} remote update").run().unwrap();
 
     Ok(())
 }
 
 fn process_repo(path: &Path, args: &Options) {
     let repo = git2::Repository::open(path).unwrap();
-    let branches;
 
     if args.remote {
         match update_remote(path) {
@@ -110,11 +110,11 @@ fn process_repo(path: &Path, args: &Options) {
         }
     }
 
-    if args.all_branch {
-        branches = git::get_all_branches(&repo);
+    let branches = if args.all_branch {
+        git::get_all_branches(&repo)
     } else {
-        branches = git::get_default_branch(&repo);
-    }
+        git::get_default_branch(&repo)
+    };
 
     for branch in branches {
         if let Some(ref ignore_regex) = args.ignore_branch_regex {

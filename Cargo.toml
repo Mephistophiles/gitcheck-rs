@@ -14,12 +14,12 @@ clap = { version = "3", features = ["derive"] }
 crossbeam-channel = "0.5"
 crossbeam-utils = "0.8"
 flexi_logger = "0.22"
-git2 = "0.13"
+git2 = "0.14"
 jwalk = "0.6"
 log = "0.4"
-num_cpus = "1.13"
+num_cpus = "1"
 regex = "1"
-xshell = "0.1"
+xshell = "0.2"
 
 [profile.release]
 lto = "fat"
