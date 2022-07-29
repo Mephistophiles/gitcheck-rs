@@ -14,7 +14,7 @@ clap = { version = "3", features = ["derive"] }
 crossbeam-channel = "0.5"
 crossbeam-utils = "0.8"
 flexi_logger = "0.22"
-git2 = "0.14"
+git2 = "0.15"
 jwalk = "0.6"
 log = "0.4"
 num_cpus = "1"
