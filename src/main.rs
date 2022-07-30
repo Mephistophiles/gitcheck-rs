@@ -60,8 +60,11 @@ fn print_stat(stat: usize, origin: &str, name: &str) {
     );
 }
 
-fn print_changes(pwd: &Path, changeset: Changeset) {
-    let mut repo_path = changeset.path().strip_prefix(&pwd).unwrap();
+fn print_changes(cwd: &Path, changeset: Changeset) {
+    let mut repo_path = changeset
+        .path()
+        .strip_prefix(&cwd)
+        .unwrap_or_else(|_| changeset.path());
     if repo_path == Path::new("") {
         repo_path = Path::new(changeset.path().file_name().unwrap());
     }
@@ -100,7 +103,7 @@ fn update_remote(path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn process_repo(path: &Path, args: &Options) {
+fn process_repo(cwd: &Path, path: &Path, args: &Options) {
     let repo = git2::Repository::open(path).unwrap();
 
     if args.remote {
@@ -125,7 +128,7 @@ fn process_repo(path: &Path, args: &Options) {
 
         if let Ok(changeset) = git::check_repository(&repo, path, &branch, args) {
             if !args.quiet || changeset.has_changes() {
-                print_changes(path, changeset);
+                print_changes(cwd, changeset);
             }
         }
     }
@@ -148,13 +151,15 @@ fn main() {
     debug!("Processing repositories... please wait.");
 
     for _ in 0..args.jobs {
+        // get current working directory
+        let cwd = std::env::current_dir().unwrap();
         let rx = rx.clone();
         let wg = wg.clone();
         let args = args.clone();
 
         thread::spawn(move || {
             for path in rx.iter() {
-                process_repo(&path, &args);
+                process_repo(&cwd, &path, &args);
             }
 
             drop(wg);
