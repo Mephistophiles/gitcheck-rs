@@ -79,12 +79,12 @@ where
     Ok(())
 }
 
-pub(crate) fn search_repositories<F>(max_depth: usize, pwd: &Path, f: F)
+pub(crate) fn search_repositories<F>(max_depth: Option<usize>, pwd: &Path, f: F)
 where
     F: Fn(PathBuf),
 {
     debug!("Beginning scan... building list of git folders");
     debug!("  Scan git repositories from {}", pwd.display());
-    let _ = search_repositories_parallel(max_depth, pwd, f);
+    let _ = search_repositories_parallel(max_depth.unwrap_or(usize::MAX), pwd, f);
     debug!("Done");
 }

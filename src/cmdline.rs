@@ -51,7 +51,7 @@ pub(crate) struct Options {
 
     /// Limit the depth of repositories search
     #[clap(short, long)]
-    pub(crate) max_depth: usize,
+    pub(crate) max_depth: Option<usize>,
 
     /// Specifies  the  number  of jobs (commands) to run simultaneously. (Default $(nprocs))
     #[clap(short, long, default_value_t = num_cpus::get())]
