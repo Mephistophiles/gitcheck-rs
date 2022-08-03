@@ -1,6 +1,6 @@
 [package]
 name = "gitcheck"
-version = "0.0.5"
+version = "0.0.6"
 authors = ["Maxim Zhukov <mussitantesmortem@gmail.com>"]
 edition = "2021"
 include = ["src/**/*", "LICENSE", "README.md"]
