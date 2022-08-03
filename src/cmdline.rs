@@ -46,7 +46,7 @@ pub(crate) struct Options {
     pub(crate) ignore_branch_regex: Option<Regex>,
 
     /// Search <dir> for repositories (can be used multiple times)
-    #[clap(short = 'd', long = "dirs")]
+    #[clap(short = 'd', long = "dir")]
     pub(crate) working_directories: Vec<PathBuf>,
 
     /// Limit the depth of repositories search
