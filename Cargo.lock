@@ -180,9 +180,9 @@ checksum = "3f107b87b6afc2a64fd13cac55fe06d6c8859f12d4b14cbcdd2c67d0976781be"
 
 [[package]]
 name = "flexi_logger"
-version = "0.22.6"
+version = "0.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c76a80dd14a27fc3d8bc696502132cb52b3f227256fd8601166c3a35e45f409"
+checksum = "b9907f32995cb751ef3e4451ffdbd9f0aa6f503365fdbb9feed9e2ae087cb50d"
 dependencies = [
  "ansi_term",
  "atty",
